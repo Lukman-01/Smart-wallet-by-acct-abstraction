@@ -215,7 +215,7 @@ export default function Home() {
       {/* <NavigationBar /> */}
       <div className="w-full max-w-4xl p-6 space-y-4">
         <h2 className="text-3xl md:text-4xl text-center text-white font-bold mb-6">
-          Your Smart Wallet
+          Simple Wallet Creation Using Acct Abstraction
         </h2>
 
         <div className="bg-white p-6 rounded-lg shadow-lg">
