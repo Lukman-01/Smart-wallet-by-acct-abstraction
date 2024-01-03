@@ -6,27 +6,28 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 import "./SimpleAccount.sol";
 
-/**
- * A sample factory contract for SimpleAccount
- * A UserOperations "initCode" holds the address of the factory, and a method call (to createAccount, in this sample factory).
- * The factory's createAccount returns the target account address even if it is already installed.
- * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
- */
+/// @title A Factory Contract for Creating SimpleAccount Instances
+/// @notice This contract allows users to create and manage instances of SimpleAccount
+/// @dev Uses OpenZeppelin's Create2 and ERC1967Proxy for deterministic address generation and proxy functionality
 contract SimpleAccountFactory {
+    /// @notice Address of the account implementation template
+    /// @dev This is an immutable template used for creating new account instances
     SimpleAccount public immutable accountImplementation;
 
-    mapping(address => uint) balance;
+    /// @dev Mapping to keep track of balances added to different accounts
+    mapping(address => uint) private balance;
 
+    /// @notice Constructs the SimpleAccountFactory
+    /// @param _entryPoint The entry point address used for initializing SimpleAccount instances
     constructor(IEntryPoint _entryPoint) {
         accountImplementation = new SimpleAccount(_entryPoint);
     }
 
-    /**
-     * create an account, and return its address.
-     * returns the address even if the account is already deployed.
-     * Note that during UserOperation execution, this method is called only if the account is not deployed.
-     * This method returns an existing account address so that entryPoint.getSenderAddress() would work even after account creation
-     */
+    /// @notice Create a new SimpleAccount instance or return the address of an existing one
+    /// @dev Deploys a new SimpleAccount proxy contract using the ERC1967Proxy pattern
+    /// @param owner The owner address for the new SimpleAccount
+    /// @param salt A unique salt for deterministic address generation
+    /// @return ret The address of the newly created or existing SimpleAccount
     function createAccount(
         address owner,
         uint256 salt
@@ -46,9 +47,11 @@ contract SimpleAccountFactory {
         );
     }
 
-    /**
-     * calculate the counterfactual address of this account as it would be returned by createAccount()
-     */
+    /// @notice Computes the address of a SimpleAccount that would be created with the provided owner and salt
+    /// @dev Uses the CREATE2 opcode for deterministic address generation
+    /// @param owner The owner address to use in the computation
+    /// @param salt The salt to use in the computation
+    /// @return The computed address of the SimpleAccount
     function getTheAddress(
         address owner,
         uint256 salt
@@ -68,14 +71,17 @@ contract SimpleAccountFactory {
             );
     }
 
-    // To add funds to a wallet
+    /// @notice Add funds to a SimpleAccount's balance within this factory
+    /// @dev Increases the balance mapping for the specified account
+    /// @param account The address of the account to fund
     function fundWallet(address account) public payable {
         balance[account] += msg.value;
     }
 
-    // Function to view the balance of a wallet.
+    /// @notice Returns the balance associated with a SimpleAccount in this factory
+    /// @param account The address of the account to query
+    /// @return The balance of the specified account
     function balanceOf(address account) public view returns (uint256) {
-        // Return the balance of the specified wallet.
         return balance[account];
     }
 }
