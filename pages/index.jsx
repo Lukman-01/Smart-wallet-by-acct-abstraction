@@ -286,6 +286,7 @@ export default function Home() {
                 onChange={(e) => setAmountToFund(e.target.value)}
                 name={'name'} required maxLength={"10"}
                 type='number'
+                step="0.1"
                 className="px-4 py-2 w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Amount in ETH"
               />
